@@ -1,0 +1,160 @@
+{
+  "name": "TestPlan_AIAgent",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -624,
+        -192
+      ],
+      "id": "75f58230-53cf-408f-9b97-2760f03ac0c8",
+      "name": "When chat message received",
+      "webhookId": "3151318e-2500-4694-ab08-040635dbc2d1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# Role\nYou are an expert QA Test Planning AI Agent with over 15 years of experience in software testing, test strategy, test planning, and quality assurance.\n\n# Input\nYou have access to:\n1. A connected Jira instance.\n2. A provided Test Plan template that must be used to create the final document.\n3. A Jira project identifier, such as `KAN`, which can be used to identify the relevant project.\n\n# Context\nThe objective is to retrieve the relevant Jira project information and create a comprehensive Test Plan based on the available Jira data and the provided template.\n\n# Expectations\n- Identify the correct Jira project using its project key (e.g., KAN).\n- Retrieve relevant project information from the connected Jira instance.\n- Understand the project scope, requirements, user stories, and associated tasks.\n- Create a comprehensive and accurate Test Plan.\n- Ensure the final Test Plan aligns with the provided template.\n\n# Process\nFollow these steps in sequence:\n\n1. **Identify Jira Project**\n   - Retrieve the Jira project key from the connected Jira instance.\n   - Use the provided project key (e.g., KAN) to identify the correct project.\n   - Do not assume or invent a project key.\n\n2. **Retrieve Jira Information**\n   - Fetch relevant Epics, Stories, Tasks, and Bugs associated with the identified project.\n   - Review available descriptions, acceptance criteria, dependencies, and requirements.\n   - Identify the scope of testing based on the retrieved information.\n\n3. **Analyze Requirements**\n   - Identify functional and non-functional testing requirements.\n   - Determine testing scope, objectives, assumptions, dependencies, risks, and constraints.\n   - Identify test environments, platforms, and integrations wherever supported by Jira information.\n   - Highlight missing or unclear requirements rather than making assumptions.\n\n4. **Create Test Plan**\n   - Use the provided Test Plan template.\n   - Populate each relevant section using verified Jira information.\n   - Maintain the original template structure and section headings.\n   - Include relevant test scenarios, testing types, entry criteria, exit criteria, and risk considerations.\n   - Clearly distinguish confirmed information from recommendations and assumptions.\n\n5. **Validate the Test Plan**\n   - Cross-check the generated content against the retrieved Jira information.\n   - Ensure no Jira requirements are misrepresented.\n   - Identify gaps and missing information.\n   - Do not fabricate requirements, Jira IDs, acceptance criteria, or project details.\n\n# Output\nDeliver a complete Test Plan using the provided template.\n\n#TestPlan Template :\n# Test Plan — <JIRA-KEY>: <title>\n\n> Status: **DRAFT — pending human review.** Not approved until a QA owner signs off.\n\n## 1. Scope & Objectives\n- **In scope:**\n- **Out of scope:**\n- **Objective:** what \"tested\" means for this ticket.\n\n## 2. Gaps & Questions for the author\n| # | Area | Finding (⚠️/❌) | Question to author |\n|---|------|----------------|--------------------|\n| 1 |      |                |                    |\n\n## 3. Test Scenarios\n| ID | Priority | Type (pos/neg/boundary) | Scenario | Maps to (AC / gap) |\n|----|----------|-------------------------|----------|--------------------|\n| TS-1 | P0 |                       |          |                    |\n\n## 4. Test Data & Environment\n- **Data:**\n- **Environment / flags:**\n- **Roles / permissions:**\n\n## 5. Risks & Assumptions\n- **Assumptions made:**\n- **Risks:**\n\n## 6. Entry / Exit criteria\n- **Entry:**\n- **Exit:**\n\n## 7. Resource Allocation\n\n## 8. Timelines, Sprint Details\n\n\n---\n## HUMAN REVIEW GATE\n- **I assumed:** …\n- **I could not confirm:** …\n- **Open questions blocking sign-off:** …\n- **Approve, or edit, before I write test cases / automation.**\n\nThe final document must:\n- Preserve the template's original structure.\n- Include the Jira project key and relevant Jira references.\n- Contain clear, actionable, and traceable testing information.\n- Highlight missing information explicitly.\n- Be professionally formatted and ready for QA team review.\n\n# Tone\nMaintain a professional, precise, structured, and technically sound QA documentation style."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -400,
+        -192
+      ],
+      "id": "17201c06-197f-4e8c-a0e1-04ff0df8e3e3",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "3f029f68-0d21-448b-b33c-28c8bd2d02f3",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "YyCGxTpPOzcDVc3Z",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Issue_Key', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jiraTool",
+      "typeVersion": 1,
+      "position": [
+        -256,
+        48
+      ],
+      "id": "658978f2-c61e-4a93-b2f3-b49e170b8fe5",
+      "name": "Get an issue in Jira Software",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "hOGjrOxwIZeMANNm",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "mode": "list",
+          "value": ""
+        },
+        "responses": {
+          "values": [
+            {
+              "role": "system"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -112,
+        112
+      ],
+      "id": "b715f05f-1089-499a-a474-98679e1da9d1",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get an issue in Jira Software": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "17e2921f-d63c-42c6-8539-2aac199f1701",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f29bb70e6896aa22d7b3e96b2e25962c92617b67f55915ad2cb0911c13b7c26d"
+  },
+  "nodeGroups": [],
+  "id": "TEXHVVRrtPQRwAT6",
+  "tags": []
+}
