@@ -1,0 +1,25 @@
+{
+  "name": "testplan-ai-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Intelligent Test Plan AI Agent - JIRA issue to test plan (React + Express)",
+  "scripts": {
+    "dev": "concurrently -n server,client -c blue,green \"npm:server\" \"npm:client\"",
+    "server": "node --watch server/index.js",
+    "client": "vite"
+  },
+  "dependencies": {
+    "dompurify": "^3.1.7",
+    "express": "^4.21.1",
+    "html2pdf.js": "^0.14.0",
+    "marked": "^14.1.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.3",
+    "concurrently": "^9.0.1",
+    "vite": "^5.4.10"
+  }
+}
