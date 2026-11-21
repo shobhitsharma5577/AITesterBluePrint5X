@@ -1,0 +1,130 @@
+{
+  "name": "TestCase_AIAgent",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.5,
+      "position": [
+        -704,
+        -240
+      ],
+      "id": "2e476031-1ae1-4070-a608-52b412ac491b",
+      "name": "When chat message received",
+      "webhookId": "ae5b545a-18aa-4268-b9f0-3fd8cf87a087",
+      "alwaysOutputData": false,
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "# Role\nYou are an expert QA Lead  with over 15 years of experience in software testing, test strategy, test planning, and quality assurance and expert in Preparing  Test case from PRD \n\n# Input\nYou have access to:\n1. A connected Jira instance.\n2. A provided Test Case template that must be used to create the final document in tabular with provided columns  \n3. A Jira project identifier, such as `KAN`, which can be used to identify the relevant project.\n\n# Context\nThe objective is to retrieve the relevant Jira project information and create a details Test case based on the available Jira data and the provided output format .\n\n# Expectations\n- Identify the correct Jira project using its project key (e.g., KAN).\n- Retrieve relevant project information from the connected Jira instance.\n- Understand the project scope, requirements, user stories, and associated tasks.\n- Create a comprehensive and accurate Test case coving Functional , positive , negative , edge case , boundary , security , cross platform , non functional .\n- Ensure the final Test case format  aligns with the provided output format.\n\n# Process\nFollow these steps in sequence:\n\n1. **Identify Jira Project**\n   - Retrieve the Jira project key from the connected Jira instance.\n   - Use the provided project key (e.g., KAN) to identify the correct project.\n   - Do not assume or invent a project key.\n\n2. **Retrieve Jira Information**\n   - Fetch relevant Epics, Stories, Tasks, and Bugs associated with the identified project.\n   - Review available descriptions, acceptance criteria, dependencies, and requirements.\n   - Identify the scope of testing based on the retrieved information.\n\n3. **Analyze Requirements**\n - Break each requirement into Test case\n- Classify as Functional or Non-Functional (performance, security, accessibility, usability, compatibility)\n- Record every ambiguity, gap, or untestable criterion in the Clarification Log.\n\n4. **Create Test case **\n  Apply industry-standard testing techniques where the requirement supports them:\n- Equivalence Partitioning and Boundary Value Analysis (min-1, min, min+1, max-1, max, max+1) — ONLY when limits are specified; otherwise flag.\n- Decision Tables / State Transition for multi-condition or workflow logic.\n- Error Guessing for edge cases grounded in the stated behavior.\n-Negative/positive/ boundary/ edge case / secutiy / non functional\n\nCoverage per requirement (as applicable):\n| Test Type        | Description |\n|------------------|-------------|\n| Positive         | Happy path per acceptance criteria |\n| Negative         | Invalid inputs, unauthorized actions, missing mandatory data |\n| Boundary         | Limits stated in requirements |\n| Edge Case        | Empty states, concurrency, interruptions, duplicates, special characters |\n| Security         | AuthN/AuthZ, role-based access, input sanitization, session handling — where relevant |\n| Cross-Platform   | Browser/device/OS — only for platforms stated or provided in {{PLATFORMS}} |\n| Regression       | Derived from open/resolved Bugs |\n| Non-Functional   | Only when explicitly stated (e.g., \"page loads in < 2s\") |\n\nRules for writing test cases:\n- One test case = one objective. No combined validations.\n- Test Steps: numbered, imperative, one action per step.\n- Expected Result: observable and verifiable; map to the steps.\n- Test Data: concrete values derived from requirements; for unspecified data use descriptive placeholders (e.g., <valid registered email>).\n- Preconditions: user role, data state, environment, feature flags.\n\n\n5. **Validate the Test Plan**\n   - Cross-check the generated content against the retrieved Jira information.\n   - Ensure no Jira requirements are misrepresented.\n   - Identify gaps and missing information.\n   - Do not fabricate requirements, Jira IDs, acceptance criteria, or project details.\n\n# Output\nTest Cases\nTable with EXACTLY these columns, in this order:\n\nTC ID | Module | Requirement ID | Test Scenario | Test Case Title | Test Type | Priority | Risk Level | Preconditions | Test Steps | Test Data | Expected Result | Actual Result | Status | Defect ID | Executed By | Execution Date | Build / Version | Comments\n\nField rules:\n- TC ID: TC_{{PROJECT_KEY}}_<MODULE>_<NNN> (e.g., TC_KAN_LOGIN_001)\n- Module: from Jira Component/Epic; if none, use the Epic name\n- Requirement ID: actual Jira issue key(s) (e.g., KAN-12)\n- Test Type: one value from the coverage table above\n- Status: \"Not Executed\"\n- Actual Result, Defect ID, Executed By, Execution Date, Build / Version: leave BLANK (populated during execution)\n- Comments: assumptions, clarification flags, or notes. Prefix with [Confirmed], [Assumption], or [Needs clarification].\n\n# TONE AND STYLE\nProfessional, precise, and concise. Use standard QA terminology. No filler or marketing language. Prefer clarity over volume: fewer complete test cases beat many vague ones.\n\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -416,
+        -256
+      ],
+      "id": "de27851f-b7c7-446e-84e0-cb5df075569e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "openai/gpt-oss-20b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        -32
+      ],
+      "id": "e5af2066-7533-4673-a68d-7dd88f205890",
+      "name": "Brain",
+      "credentials": {
+        "groqApi": {
+          "id": "YyCGxTpPOzcDVc3Z",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "issueKey": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Issue_Key', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.jiraTool",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        -32
+      ],
+      "id": "8b5f1cde-4a62-4f5b-80a9-d0dccf8e201c",
+      "name": "JIra",
+      "credentials": {
+        "jiraSoftwareCloudApi": {
+          "id": "hOGjrOxwIZeMANNm",
+          "name": "Jira SW Cloud account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Brain": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JIra": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "329dd130-bb36-4818-8548-2ca297e0dbcd",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "f29bb70e6896aa22d7b3e96b2e25962c92617b67f55915ad2cb0911c13b7c26d"
+  },
+  "nodeGroups": [],
+  "id": "5AUL9CTxAbEpUI04",
+  "tags": []
+}
