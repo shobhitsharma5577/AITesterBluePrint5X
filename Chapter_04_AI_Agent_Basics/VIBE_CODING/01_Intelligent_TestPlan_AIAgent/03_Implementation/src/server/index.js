@@ -253,7 +253,15 @@ app.post('/api/generate', route(async (req, res) => {
   const fileName = `${issueKey}_TestPlan.md`;
   fs.writeFileSync(path.join(OUTPUT_DIR, fileName), markdown, 'utf8');
 
-  res.json({ ok: true, issueKey, markdown, savedAs: `output/${fileName}` });
+  res.json({
+    ok: true,
+    issueKey,
+    summary: issue.summary,
+    model: llm.provider === 'groq' ? `Groq (${llm.groqModel})` : `Ollama (${llm.ollamaModel})`,
+    generatedAt: new Date().toISOString(),
+    markdown,
+    savedAs: `output/${fileName}`,
+  });
 }));
 
 app.listen(PORT, '127.0.0.1', () => {
