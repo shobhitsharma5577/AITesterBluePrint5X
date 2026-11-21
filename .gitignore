@@ -12,3 +12,6 @@ dist/
 
 # Generated test plans (Test Plan AI Agent)
 **/03_Implementation/src/output/
+
+# Vite dependency cache
+.vite/
