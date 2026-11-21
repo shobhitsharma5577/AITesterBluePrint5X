@@ -1,8 +1,9 @@
 # QA AI agents
 
-Two local web apps that turn a JIRA story into QA work. Both use the same design and the same Settings drawer for JIRA and the LLM (Groq or Ollama):
+Three local web apps that turn a JIRA story into QA work. All use the same design and the same Settings drawer for JIRA and the LLM (Groq or Ollama):
 
 - [QA TestPlan AI agent](#qa-testplan-ai-agent): JIRA story -> test plan (Markdown, exported to PDF)
+- [QA TestStrategy AI agent](#qa-teststrategy-ai-agent): JIRA story -> evidence-based test strategy with a human approval gate (Markdown and PDF)
 - [QA TestCase AI agent](#qa-testcase-ai-agent): JIRA story -> test cases (table, exported to Excel)
 
 ---
@@ -38,6 +39,50 @@ The target design: the Test Plan page (left) and the Settings drawer (right).
 1. Scope & Objectives | 2. Gaps & Questions for the author | 3. Test Scenarios | 4. Test Data & Environment | 5. Risks & Assumptions | 6. Entry / Exit criteria | 7. Resource Allocation | 8. Timelines, Sprint Details | Human Review Gate
 
 Every plan starts as **DRAFT — pending human review** and is not approved until a QA owner signs off. Anything the story does not say is written as `Insufficient information to determine.`, and inferred details are marked `Inference (low confidence)`.
+
+---
+
+## QA TestStrategy AI agent
+
+A local web app that turns a JIRA story into a feature-specific, risk-based test strategy. Type a story key (for example `KAN-4`), and the agent fetches the story with its comments, parent, linked issues and text attachments from JIRA, sends them to an LLM (Groq or Ollama) with [TestStrategy_Template.md](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/02_Plan/Template/TestStrategy_Template.md), shows the strategy on the page and saves it as `02_Plan/Output/<KEY>_TestStrategy.md` and `<KEY>_TestStrategy.pdf`. Built from [RICEPOT_PROMPT.md](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/02_Plan/Prompt/RICEPOT_PROMPT.md).
+
+📁 Source: [02_Intelligent_TestStrategy_AIAgent/](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/)
+
+### 🎨 Design
+
+The target design: the Test Strategy page (left) and the Settings drawer (right).
+
+![QA TestStrategy AI agent design](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/01_Design/Teststrategy_Design.png)
+
+### 🖥️ Built app
+
+**Generated test strategy:** the result for story `KAN-4` (PRD: Social & WhatsApp Login) with Groq `openai/gpt-oss-120b`. Every statement cites its JIRA source, and gaps are written as `Insufficient information to determine.` **Export** downloads the strategy as Markdown or PDF, and **Regenerate** runs the same story again.
+
+![QA TestStrategy AI agent generated strategy](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/01_Design/TestStrategy_UI_Result.png)
+
+**Human review and approval gate:** every strategy starts as **Pending Human Approval**. Type requested changes in the message box to update the strategy (the status resets to pending), or enter the approver name and click **Approve Strategy**. The Markdown and PDF files are rewritten with the new status.
+
+![QA TestStrategy AI agent approval gate](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/01_Design/TestStrategy_UI_Approval.png)
+
+**Settings drawer:** opened with the gear icon. It is pre-filled from `config.env`, has the JIRA connection (URL, email, API token) and the LLM provider (Groq or Ollama), and a test button for each. The API token and Groq key stay on the backend: the page only shows whether they are configured.
+
+![QA TestStrategy AI agent settings](Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/01_Design/TestStrategy_UI_Settings.png)
+
+### 📋 Test strategy sections
+
+1. Feature Overview | 2. Scope and Objectives | 3. Risk and Impact Assessment | 4. Testing Coverage | 5. Test Approach | 6. Environment and Test Data | 7. Dependencies and Assumptions | 8. Defect Management | 9. Entry and Exit Criteria | 10. Roles, Schedule and Deliverables | 11. Reporting and Metrics | 12. Human Review and Approval Gate
+
+The backend checks that every template heading is present and in order before saving. Section 12 lists assumptions, information that could not be confirmed, blocking and non-blocking questions, risks and QA recommendations.
+
+### ▶️ Run
+
+```bash
+cd Chapter_04_AI_Agent_Basics/VIBE_CODING/02_Intelligent_TestStrategy_AIAgent/03_Implementation/src
+npm install
+npm run dev   # API on http://127.0.0.1:3003, UI on http://localhost:5175
+```
+
+On the Groq free tier (8,000 tokens per minute) the strategy is generated in three parts with short waits between them, so one run takes about 2 minutes.
 
 ---
 
